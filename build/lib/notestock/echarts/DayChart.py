@@ -40,8 +40,10 @@ class DayChart:
         self.df = None
         self.chart_data = None
         self.pro = ts.pro_api()
+        self.start_date = '20190801'
+        self.end_date = '20191010'
 
-    def init_data(self, ts_code=None, start_date='20190801', end_date='20191010'):
+    def init_data(self, ts_code=None):
 
         if ts_code is None:
             response = requests.get(
@@ -54,11 +56,11 @@ class DayChart:
                              , ts_code=ts_code
                              , asset='E'
                              , freq='d'
-                             , start_date=start_date
-                             , end_date=end_date)
+                             , start_date=self.start_date
+                             , end_date=self.end_date)
 
         self.df.sort_values(['trade_date'], inplace=True)
-        
+
         json_response = self.df[['trade_date', 'open', 'high', 'low', 'close', 'vol']].values.tolist()
         self.chart_data = split_data(data=json_response)
 
@@ -236,8 +238,3 @@ class DayChart:
         grid_chart = self.draw_charts()
 
         return grid_chart
-
-
-day = DayChart()
-
-chart = day.get_chart(ts_code='002415.SZ')
