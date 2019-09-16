@@ -50,19 +50,21 @@ class DayChart:
                 url="https://echarts.baidu.com/examples/data/asset/data/stock-DJI.json"
             )
             json_response = response.json()
-            return split_data(data=json_response)
+            self.chart_data = split_data(data=json_response)
+            return
+        else:
+            self.df = ts.pro_bar(api=self.pro
+                                 , ts_code=ts_code
+                                 , asset='E'
+                                 , freq='d'
+                                 , start_date=self.start_date
+                                 , end_date=self.end_date)
 
-        self.df = ts.pro_bar(api=self.pro
-                             , ts_code=ts_code
-                             , asset='E'
-                             , freq='d'
-                             , start_date=self.start_date
-                             , end_date=self.end_date)
+            self.df.sort_values(['trade_date'], inplace=True)
 
-        self.df.sort_values(['trade_date'], inplace=True)
-
-        json_response = self.df[['trade_date', 'open', 'high', 'low', 'close', 'vol']].values.tolist()
-        self.chart_data = split_data(data=json_response)
+            json_response = self.df[['trade_date', 'open', 'high', 'low', 'close', 'vol']].values.tolist()
+            self.chart_data = split_data(data=json_response)
+            return
 
     def draw_charts(self):
         kline_data = [data[1:-1] for data in self.chart_data["values"]]
