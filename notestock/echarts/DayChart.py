@@ -40,6 +40,8 @@ class DayChart:
         self.df = None
         self.chart_data = None
         self.pro = ts.pro_api()
+
+        self.freq = 'd'
         self.start_date = '20190801'
         self.end_date = '20191010'
 
@@ -56,7 +58,7 @@ class DayChart:
             self.df = ts.pro_bar(api=self.pro
                                  , ts_code=ts_code
                                  , asset='E'
-                                 , freq='d'
+                                 , freq=self.freq
                                  , start_date=self.start_date
                                  , end_date=self.end_date)
 
