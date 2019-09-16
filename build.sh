@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 rm -rf bulid
-
 rm -rf dist
+rm -rf notestock.egg-info
 
 # 编译
 python setup.py build
@@ -17,3 +17,14 @@ python setup.py bdist_wheel
 # 发布包
 twine upload dist/*
 
+
+rm -rf notestock.egg-info
+rm -rf dist
+rm -rf bulid
+
+
+
+git pull
+git add -A
+git commit -a -m "add"
+git push
