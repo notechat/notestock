@@ -10,12 +10,20 @@ import os
 import time
 
 import tushare as ts
+from notetool.tool import SecretManage
 from tqdm import tqdm
 
 
+def read_local(token):
+    secret = SecretManage(key='ts_token', value=token, path='stock')
+    ts.set_token(secret.read())
+    pass
+
+
 class DatabaseStock:
-    def __init__(self, connection=None, pro=ts.pro_api(), path_base='tmp'):
-        self.pro = pro
+    def __init__(self, connection=None, token=None, path_base='tmp'):
+        read_local(token=token)
+        self.pro = ts.pro_api()
         self.connect = connection
 
         self.path_base = path_base
@@ -108,12 +116,3 @@ class DatabaseStock:
         for line in data.values:
             ts_code = line[0]
             self.stock_min_updated_one(ts_code=ts_code, start_date=start_date, end_date=end_date, freq=freq)
-
-
-ts.set_token('79b91762c7f42780ccd697e5d228f28b446fb13a938e5012a2c1d25e')
-
-df = DatabaseStock(path_base='/Users/liangtaoniu/workspace/MyDiary/tmp/stock')
-
-df.stock_basic_create()
-df.stock_basic_updated_data()
-df.stock_daily_updated_all(freq='D', end_date="")
