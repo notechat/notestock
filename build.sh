@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-rm -rf build
-rm -rf dist
-rm -rf notestock.egg-info
-
 # 编译
 python setup.py build
 # 生成 tar.gz
@@ -20,7 +16,7 @@ twine upload dist/*
 
 rm -rf notestock.egg-info
 rm -rf dist
-rm -rf bulid
+rm -rf build
 
 
 
