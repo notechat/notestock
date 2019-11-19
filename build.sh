@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm -rf bulid
+rm -rf build
 rm -rf dist
 rm -rf notestock.egg-info
 
