@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2019/04/04 00:31
 # @Author  : niuliangtao
-# @Site    : 
-# @File    : mysql.py
+# @Site    :
 # @Software: PyCharm
 
 import time
@@ -20,7 +19,6 @@ class DatabaseStock:
     def stock_basic_create(self):
         try:
             with self.connect.cursor() as cursor:
-                # Create a new record
                 sql = """CREATE TABLE IF NOT EXISTS stock_basic (
             ts_code       VARCHAR(255) COMMENT 'TS代码'
            ,symbol        VARCHAR(255) COMMENT '股票代码'
@@ -36,7 +34,6 @@ class DatabaseStock:
            ,list_date     VARCHAR(255) COMMENT '上市日期'
            ,delist_date   VARCHAR(255) COMMENT '退市日期'
            ,is_hs         VARCHAR(255) COMMENT '是否沪深港通标的，N否 H沪股通 S深股通'
-
            ,PRIMARY KEY (ts_code)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=1 ;
         	"""
