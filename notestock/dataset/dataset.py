@@ -1,14 +1,16 @@
 import os
 
-from notetool.database import SqliteTable
+from notedata.tables import SqliteTable
 
 
 class StockBasic(SqliteTable):
     def __init__(self, table_name='stock_basic', db_path=None, *args, **kwargs):
         if db_path is None:
-            db_path = os.path.abspath(os.path.dirname(__file__)) + '/data/stock.db'
+            db_path = os.path.abspath(
+                os.path.dirname(__file__)) + '/data/stock.db'
 
-        super(StockBasic, self).__init__(db_path=db_path, table_name=table_name, *args, **kwargs)
+        super(StockBasic, self).__init__(db_path=db_path,
+                                         table_name=table_name, *args, **kwargs)
         self.columns = ['ts_code', 'symbol', 'name', 'area', 'industry', 'fullname', 'enname', 'market', 'exchange',
                         'curr_type', 'list_status', 'list_date', 'delist_date', 'is_hs'
                         ]
@@ -38,9 +40,11 @@ class StockBasic(SqliteTable):
 class TradeDay(SqliteTable):
     def __init__(self, table_name='trade_day', db_path=None, *args, **kwargs):
         if db_path is None:
-            db_path = os.path.abspath(os.path.dirname(__file__)) + '/data/stock.db'
+            db_path = os.path.abspath(
+                os.path.dirname(__file__)) + '/data/stock.db'
 
-        super(TradeDay, self).__init__(db_path=db_path, table_name=table_name, *args, **kwargs)
+        super(TradeDay, self).__init__(db_path=db_path,
+                                       table_name=table_name, *args, **kwargs)
         self.columns = ['ts_code', 'trade_time', 'open', 'high', 'low', 'close', 'vol', 'amount', 'trade_date',
                         'pre_close']
 
