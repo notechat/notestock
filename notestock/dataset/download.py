@@ -1,4 +1,5 @@
 import os
+import time
 
 import pandas as pd
 import tushare as ts
@@ -44,6 +45,7 @@ class StockDownload:
                                     start_date=start_date,
                                     end_date=end_date)
                     if df is None:
+                        time.sleep(1)
                         continue
                     df['trade_time'] = df['trade_date']
                     self.trade.insert_list(
