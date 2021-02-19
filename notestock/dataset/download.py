@@ -45,14 +45,14 @@ class StockDownload:
                                     start_date=start_date,
                                     end_date=end_date)
                     if df is None:
-                        time.sleep(5)
+                        time.sleep(10)
                         continue
                     df['trade_time'] = df['trade_date']
                     self.trade.insert_list(
                         list(df.to_dict(orient='index').values()))
                     break
                 except Exception as e:
-                    time.sleep(5)
+                    time.sleep(10)
         self.trade.vacuum()
 
     def save_year(self, year=2020):
