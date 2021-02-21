@@ -48,6 +48,11 @@ class StockDownload:
                         time.sleep(10)
                         continue
                     df['trade_time'] = df['trade_date']
+                    df = df.rename(columns={
+                        'trade_date': 'date',
+                        'trade_time': 'time',
+                        'vol': 'volume',
+                    })
                     self.qutation.insert_list(
                         list(df.to_dict(orient='index').values()))
                     break
