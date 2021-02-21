@@ -3,7 +3,10 @@ import time
 
 import pandas as pd
 import tushare as ts
-from notestock.dataset.dataset import QuotationDay, StockBasic
+from notestock.dataset.dataset import (QuotationDay, QuotationMin1,
+                                       QuotationMin5, QuotationMin15,
+                                       QuotationMin30, QuotationMin60,
+                                       StockBasic)
 from notetool import log
 from tqdm import tqdm
 
@@ -19,9 +22,15 @@ class StockDownload:
         ts.set_token(
             '79b91762c7f42780ccd697e5d228f28b446fb13a938e5012a2c1d25e')
         self.pro = ts.pro_api()
-        self.qutation = QuotationDay(db_path=db_path)
+        self.quotation_day = QuotationDay(db_path=db_path)
+        self.quotation_min1 = QuotationMin1(db_path=db_path)
+        self.quotation_min5 = QuotationMin5(db_path=db_path)
+        self.quotation_min15 = QuotationMin15(db_path=db_path)
+        self.quotation_min30 = QuotationMin30(db_path=db_path)
+        self.quotation_min60 = QuotationMin60(db_path=db_path)
         self.basic = StockBasic(db_path=db_path)
-        self.qutation.create()
+
+        self.quotation_day.create()
         self.basic.create()
 
     def insert_basic(self):
@@ -53,12 +62,12 @@ class StockDownload:
                         'trade_time': 'time',
                         'vol': 'volume',
                     })
-                    self.qutation.insert_list(
+                    self.quotation_day.insert_list(
                         list(df.to_dict(orient='index').values()))
                     break
                 except Exception as e:
                     time.sleep(10)
-        self.qutation.vacuum()
+        self.quotation_day.vacuum()
 
     def insert_min5(self, start_date='20000901', end_date='20211011'):
         import baostock as bs
@@ -102,12 +111,12 @@ class StockDownload:
                         continue
 
                     df['ts_code'] = ts_code
-                    self.qutation.insert_list(
+                    self.quotation_min5.insert_list(
                         list(df.to_dict(orient='index').values()))
                     break
                 except Exception as e:
                     time.sleep(10)
-        self.qutation.vacuum()
+        self.quotation_min5.vacuum()
         # 登出系统 #
         bs.logout()
 
@@ -119,4 +128,4 @@ class StockDownload:
         self.insert_min5(start_date=start_date, end_date=end_date)
         self.insert_day(start_date, end_date)
 
-        self.qutation.vacuum()
+        self.quotation_day.vacuum()
