@@ -97,27 +97,32 @@ class QuotationMin(SqliteTable):
 
 class QuotationMin1(QuotationMin):
     def __init__(self, table_name='quotation_min1',  *args, **kwargs):
-        super(QuotationMin1).__init__(table_name=table_name, *args, **kwargs)
+        super(QuotationMin1, self).__init__(
+            table_name=table_name, *args, **kwargs)
 
 
 class QuotationMin5(QuotationMin):
     def __init__(self, table_name='quotation_min5',  *args, **kwargs):
-        super(QuotationMin5).__init__(table_name=table_name, *args, **kwargs)
+        super(QuotationMin5, self).__init__(
+            table_name=table_name, *args, **kwargs)
 
 
 class QuotationMin15(QuotationMin):
     def __init__(self, table_name='quotation_min15',  *args, **kwargs):
-        super(QuotationMin15).__init__(table_name=table_name, *args, **kwargs)
+        super(QuotationMin15, self).__init__(
+            table_name=table_name, *args, **kwargs)
 
 
 class QuotationMin30(QuotationMin):
     def __init__(self, table_name='quotation_min30',  *args, **kwargs):
-        super(QuotationMin30).__init__(table_name=table_name, *args, **kwargs)
+        super(QuotationMin30, self).__init__(
+            table_name=table_name, *args, **kwargs)
 
 
 class QuotationMin60(QuotationMin):
     def __init__(self, table_name='quotation_min60',  *args, **kwargs):
-        super(QuotationMin60).__init__(table_name=table_name, *args, **kwargs)
+        super(QuotationMin60, self).__init__(
+            table_name=table_name, *args, **kwargs)
 
 
 class TradeDetail(SqliteTable):
