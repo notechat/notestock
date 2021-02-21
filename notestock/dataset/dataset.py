@@ -76,6 +76,7 @@ class QuotationMin(SqliteTable):
             db_path=db_path, table_name=table_name, *args, **kwargs)
         self.columns = ['ts_code', 'date', 'time', 'open',
                         'high', 'low', 'close', 'volume', 'amount']
+        self.create()
 
     def create(self):
         self.execute("""
