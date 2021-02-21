@@ -43,22 +43,22 @@ class QuotationDay(SqliteTable):
             db_path = os.path.abspath(
                 os.path.dirname(__file__)) + '/data/stock.db'
 
-        super(QuotationDay, self).__init__(db_path=db_path,
-                                           table_name=table_name, *args, **kwargs)
-        self.columns = ['ts_code', 'trade_date', 'trade_time', 'open', 'high', 'low', 'close', 'vol', 'amount',
-                        'pre_close']
+        super(QuotationDay, self).__init__(
+            db_path=db_path, table_name=table_name, *args, **kwargs)
+        self.columns = ['code', 'date', 'time', 'open', 'high',
+                        'low', 'close', 'volume', 'amount', 'pre_close']
 
     def create(self):
         self.execute("""
             create table if not exists {} (
-               ts_code       VARCHAR(255)
-              ,trade_date    VARCHAR(255)
-              ,trade_time    VARCHAR(255)
+               code          VARCHAR(255)
+              ,date          VARCHAR(255)
+              ,time          VARCHAR(255)
               ,open          FLOAT
               ,high          FLOAT
               ,low           FLOAT
               ,close         FLOAT
-              ,vol           FLOAT
+              ,volume        FLOAT
               ,amount        FLOAT
               ,pre_close     FLOAT   
               ,primary key (ts_code,trade_time)           
@@ -66,10 +66,32 @@ class QuotationDay(SqliteTable):
             """.format(self.table_name))
 
 
-class QuotationMin(QuotationDay):
-    def __init__(self, table_name='quotation_min', *args, **kwargs):
-        super(QuotationMin, self).__init__(
-            table_name=table_name, *args, **kwargs)
+class QuotationMin(SqliteTable):
+    def __init__(self, table_name='quotation_min', db_path=None, *args, **kwargs):
+        if db_path is None:
+            db_path = os.path.abspath(
+                os.path.dirname(__file__)) + '/data/stock.db'
+
+        super(QuotationDay, self).__init__(
+            db_path=db_path, table_name=table_name, *args, **kwargs)
+        self.columns = ['code', 'date', 'time', 'open',
+                        'high', 'low', 'close', 'volume', 'amount']
+
+    def create(self):
+        self.execute("""
+            create table if not exists {} (
+               code          VARCHAR(255)
+              ,date          VARCHAR(255)
+              ,time          VARCHAR(255)
+              ,open          FLOAT
+              ,high          FLOAT
+              ,low           FLOAT
+              ,close         FLOAT
+              ,volume        FLOAT
+              ,amount        FLOAT                 
+              ,primary key (ts_code,trade_time)           
+              )
+            """.format(self.table_name))
 
 
 class TradeDetail(SqliteTable):
@@ -94,7 +116,6 @@ class TradeDetail(SqliteTable):
               ,price_mod     FLOAT
               ,vol           FLOAT
               ,amount        FLOAT
-              ,type          VARCHAR(10)
               ,primary key (ts_code,trade_time)           
               )
             """.format(self.table_name))
