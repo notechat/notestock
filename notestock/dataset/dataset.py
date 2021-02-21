@@ -37,21 +37,22 @@ class StockBasic(SqliteTable):
                 """.format(self.table_name))
 
 
-class TradeDay(SqliteTable):
-    def __init__(self, table_name='trade_day', db_path=None, *args, **kwargs):
+class QuotationDay(SqliteTable):
+    def __init__(self, table_name='quotation_day', db_path=None, *args, **kwargs):
         if db_path is None:
             db_path = os.path.abspath(
                 os.path.dirname(__file__)) + '/data/stock.db'
 
-        super(TradeDay, self).__init__(db_path=db_path,
-                                       table_name=table_name, *args, **kwargs)
-        self.columns = ['ts_code', 'trade_time', 'open', 'high', 'low', 'close', 'vol', 'amount', 'trade_date',
+        super(QuotationDay, self).__init__(db_path=db_path,
+                                           table_name=table_name, *args, **kwargs)
+        self.columns = ['ts_code', 'trade_date', 'trade_time', 'open', 'high', 'low', 'close', 'vol', 'amount',
                         'pre_close']
 
     def create(self):
         self.execute("""
             create table if not exists {} (
                ts_code       VARCHAR(255)
+              ,trade_date    VARCHAR(255)
               ,trade_time    VARCHAR(255)
               ,open          FLOAT
               ,high          FLOAT
@@ -59,13 +60,38 @@ class TradeDay(SqliteTable):
               ,close         FLOAT
               ,vol           FLOAT
               ,amount        FLOAT
-              ,trade_date    VARCHAR(255)
               ,pre_close     FLOAT   
               ,primary key (ts_code,trade_time)           
               )
             """.format(self.table_name))
 
 
-class TradeMin(TradeDay):
-    def __init__(self, table_name='trade_min', *args, **kwargs):
-        super(TradeMin, self).__init__(table_name=table_name, *args, **kwargs)
+class QuotationMin(QuotationDay):
+    def __init__(self, table_name='quotation_min', *args, **kwargs):
+        super(QuotationMin, self).__init__(
+            table_name=table_name, *args, **kwargs)
+
+
+class TradeDetail(SqliteTable):
+    def __init__(self, table_name='trade_detail', db_path=None, *args, **kwargs):
+        if db_path is None:
+            db_path = os.path.abspath(
+                os.path.dirname(__file__)) + '/data/stock.db'
+
+        super(TradeDetail, self).__init__(db_path=db_path, table_name=table_name, *args, **kwargs)
+        self.columns = ['ts_code', 'trade_date', 'trade_time', 'price', 'price_mod', 'vol', 'amount']
+
+    def create(self):
+        self.execute("""
+            create table if not exists {} (
+               ts_code       VARCHAR(255)
+              ,trade_date    VARCHAR(255)
+              ,trade_time    VARCHAR(255)
+              
+              ,price         FLOAT
+              ,price_mod     FLOAT
+              ,vol           FLOAT
+              ,amount        FLOAT
+              ,primary key (ts_code,trade_time)           
+              )
+            """.format(self.table_name))

@@ -1,5 +1,7 @@
 from notestock.dataset import StockDownload
 
-path = '/root/workspace/temp/stock-2020.db'
-down = StockDownload(db_path=path)
-down.save_year(2020)
+for year in range(2010, 2020):
+    #year = 2019
+    path = '/root/workspace/temp/stock-{}.db'.format(year)
+    down = StockDownload(db_path=path)
+    down.save_year(year)

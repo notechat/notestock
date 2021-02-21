@@ -3,7 +3,7 @@ import time
 
 import pandas as pd
 import tushare as ts
-from notestock.dataset.dataset import StockBasic, TradeDay
+from notestock.dataset.dataset import QuotationDay, StockBasic
 from notetool import log
 from tqdm import tqdm
 
@@ -19,9 +19,9 @@ class StockDownload:
         ts.set_token(
             '79b91762c7f42780ccd697e5d228f28b446fb13a938e5012a2c1d25e')
         self.pro = ts.pro_api()
-        self.trade = TradeDay(db_path=db_path)
+        self.qutation = QuotationDay(db_path=db_path)
         self.basic = StockBasic(db_path=db_path)
-        self.trade.create()
+        self.qutation.create()
         self.basic.create()
 
     def insert_basic(self):
@@ -36,7 +36,7 @@ class StockDownload:
             'select * from {}'.format(self.basic.table_name), self.basic.conn)
 
         for ts_code in tqdm(info['ts_code'].values):
-            while (True):
+            while True:
                 try:
                     df = ts.pro_bar(api=self.pro,
                                     ts_code=ts_code,
@@ -48,12 +48,12 @@ class StockDownload:
                         time.sleep(10)
                         continue
                     df['trade_time'] = df['trade_date']
-                    self.trade.insert_list(
+                    self.qutation.insert_list(
                         list(df.to_dict(orient='index').values()))
                     break
                 except Exception as e:
                     time.sleep(10)
-        self.trade.vacuum()
+        self.qutation.vacuum()
 
     def save_year(self, year=2020):
         self.insert_basic()
@@ -62,4 +62,4 @@ class StockDownload:
         end_date = '{}1231'.format(year)
         self.insert_day(start_date, end_date)
 
-        self.trade.vacuum()
+        self.qutation.vacuum()
