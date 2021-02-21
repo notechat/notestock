@@ -72,7 +72,7 @@ class QuotationMin(SqliteTable):
             db_path = os.path.abspath(
                 os.path.dirname(__file__)) + '/data/stock.db'
 
-        super(QuotationDay, self).__init__(
+        super(QuotationMin, self).__init__(
             db_path=db_path, table_name=table_name, *args, **kwargs)
         self.columns = ['code', 'date', 'time', 'open',
                         'high', 'low', 'close', 'volume', 'amount']
