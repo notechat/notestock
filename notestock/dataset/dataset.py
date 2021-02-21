@@ -94,6 +94,22 @@ class QuotationMin(SqliteTable):
             """.format(self.table_name))
 
 
+class QuotationMin1(QuotationMin):
+    pass
+
+
+class QuotationMin15(QuotationMin):
+    pass
+
+
+class QuotationMin30(QuotationMin):
+    pass
+
+
+class QuotationMin60(QuotationMin):
+    pass
+
+
 class TradeDetail(SqliteTable):
     def __init__(self, table_name='trade_detail', db_path=None, *args, **kwargs):
         if db_path is None:
