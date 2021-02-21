@@ -78,8 +78,10 @@ class TradeDetail(SqliteTable):
             db_path = os.path.abspath(
                 os.path.dirname(__file__)) + '/data/stock.db'
 
-        super(TradeDetail, self).__init__(db_path=db_path, table_name=table_name, *args, **kwargs)
-        self.columns = ['ts_code', 'trade_date', 'trade_time', 'price', 'price_mod', 'vol', 'amount']
+        super(TradeDetail, self).__init__(db_path=db_path,
+                                          table_name=table_name, *args, **kwargs)
+        self.columns = ['ts_code', 'trade_date', 'trade_time',
+                        'price', 'price_mod', 'vol', 'amount']
 
     def create(self):
         self.execute("""
@@ -92,6 +94,7 @@ class TradeDetail(SqliteTable):
               ,price_mod     FLOAT
               ,vol           FLOAT
               ,amount        FLOAT
+              ,type          VARCHAR(10)
               ,primary key (ts_code,trade_time)           
               )
             """.format(self.table_name))
