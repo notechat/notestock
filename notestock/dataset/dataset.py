@@ -45,13 +45,13 @@ class QuotationDay(SqliteTable):
 
         super(QuotationDay, self).__init__(
             db_path=db_path, table_name=table_name, *args, **kwargs)
-        self.columns = ['code', 'date', 'time', 'open', 'high',
+        self.columns = ['ts_code', 'date', 'time', 'open', 'high',
                         'low', 'close', 'volume', 'amount', 'pre_close']
 
     def create(self):
         self.execute("""
             create table if not exists {} (
-               code          VARCHAR(255)
+               ts_code       VARCHAR(255)
               ,date          VARCHAR(255)
               ,time          VARCHAR(255)
               ,open          FLOAT
@@ -61,7 +61,7 @@ class QuotationDay(SqliteTable):
               ,volume        FLOAT
               ,amount        FLOAT
               ,pre_close     FLOAT   
-              ,primary key (ts_code,trade_time)           
+              ,primary key (ts_code,time)           
               )
             """.format(self.table_name))
 
@@ -74,13 +74,13 @@ class QuotationMin(SqliteTable):
 
         super(QuotationMin, self).__init__(
             db_path=db_path, table_name=table_name, *args, **kwargs)
-        self.columns = ['code', 'date', 'time', 'open',
+        self.columns = ['ts_code', 'date', 'time', 'open',
                         'high', 'low', 'close', 'volume', 'amount']
 
     def create(self):
         self.execute("""
             create table if not exists {} (
-               code          VARCHAR(255)
+               ts_code       VARCHAR(255)
               ,date          VARCHAR(255)
               ,time          VARCHAR(255)
               ,open          FLOAT
@@ -89,7 +89,7 @@ class QuotationMin(SqliteTable):
               ,close         FLOAT
               ,volume        FLOAT
               ,amount        FLOAT                 
-              ,primary key (ts_code,trade_time)           
+              ,primary key (ts_code,time)           
               )
             """.format(self.table_name))
 
