@@ -178,12 +178,9 @@ class StockDownload:
         self.insert_basic()
         info = pd.read_sql(
             'select * from {}'.format(self.basic.table_name), self.basic.conn)
-        start_date = '{}-{}-{}'.format(start_date[:4],
-                                       start_date[4:6], start_date[6:])
-        end_date = '{}-{}-{}'.format(end_date[:4], end_date[4:6], end_date[6:])
 
         for ts_code in tqdm(info['ts_code'].values):
-            db_path = os.path.join(path, ts_code, '.db')
+            db_path = os.path.join(path, ts_code + '.db')
             stock = StockDownload(db_path=db_path)
             stock.save_one(ts_code, start_date=start_date, end_date=end_date)
 
