@@ -136,7 +136,7 @@ class StockDownload:
                                        start_date[4:6], start_date[6:])
         end_date = '{}-{}-{}'.format(end_date[:4], end_date[4:6], end_date[6:])
         for ts_code in tqdm(info['ts_code'].values):
-            for freq in ('5', '10', '15', '30', '60'):
+            for freq in ('5', '15', '30', '60'):
                 self._insert_min_bao_stock(
                     ts_code, start_date, end_date, frequency=freq)
         self.quotation_min5.vacuum()
@@ -146,7 +146,7 @@ class StockDownload:
                                        start_date[4:6], start_date[6:])
         end_date = '{}-{}-{}'.format(end_date[:4], end_date[4:6], end_date[6:])
 
-        for freq in ('5', '10', '15', '30', '60'):
+        for freq in ('5', '15', '30', '60'):
             self._insert_min_bao_stock(
                 ts_code, start_date, end_date, frequency=freq)
         self.quotation_min5.vacuum()
