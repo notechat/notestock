@@ -126,8 +126,7 @@ class StockDownload:
             except Exception as e:
                 time.sleep(10)
         quotation.vacuum()
-        # 登出系统 #
-        bs.logout()
+        
 
     def insert_min_all_bao_stock(self, start_date='20000901', end_date='20211011'):
         info = pd.read_sql(
