@@ -1,6 +1,8 @@
+# coding=utf-8
 import os
 import time
 
+import baostock as bs
 import pandas as pd
 import tushare as ts
 from notestock.dataset.dataset import (QuotationDay, QuotationMin1,
@@ -33,6 +35,12 @@ class StockDownload:
         self.quotation_day.create()
         self.basic.create()
 
+        # 登陆系统 ####
+        lg = bs.login()
+        # 显示登陆返回信息
+        print('login respond error_code:' + lg.error_code)
+        print('login respond  error_msg:' + lg.error_msg)
+
     def insert_basic(self):
         stock_info = self.pro.stock_basic(exchange='', list_status='L')
         response = self.basic.insert_list(
@@ -40,92 +48,141 @@ class StockDownload:
         logger.info("update stock info {} rows {}".format(
             len(stock_info), response))
 
-    def insert_day(self, start_date='20000901', end_date='20211011'):
-        info = pd.read_sql(
-            'select * from {}'.format(self.basic.table_name), self.basic.conn)
-
-        for ts_code in tqdm(info['ts_code'].values):
-            while True:
-                try:
-                    df = ts.pro_bar(api=self.pro,
-                                    ts_code=ts_code,
-                                    asset='E',
-                                    freq='d',
-                                    start_date=start_date,
-                                    end_date=end_date)
-                    if df is None:
-                        time.sleep(10)
-                        continue
-                    df['trade_time'] = df['trade_date']
-                    df = df.rename(columns={
-                        'trade_date': 'date',
-                        'trade_time': 'time',
-                        'vol': 'volume',
-                    })
-                    self.quotation_day.insert_list(
-                        list(df.to_dict(orient='index').values()))
-                    break
-                except Exception as e:
+    def _insert_day_tushare(self, ts_code, start_date='20000901', end_date='20211011'):
+        while True:
+            try:
+                df = ts.pro_bar(api=self.pro, ts_code=ts_code, asset='E', freq='d', start_date=start_date,
+                                end_date=end_date)
+                if df is None:
                     time.sleep(10)
+                    continue
+                df['trade_time'] = df['trade_date']
+                df = df.rename(columns={
+                    'trade_date': 'date',
+                    'trade_time': 'time',
+                    'vol': 'volume',
+                })
+                self.quotation_day.insert_list(
+                    list(df.to_dict(orient='index').values()))
+                break
+            except Exception as e:
+                time.sleep(10)
         self.quotation_day.vacuum()
 
-    def insert_min5(self, start_date='20000901', end_date='20211011'):
-        import baostock as bs
-        import pandas as pd
-
-        # 登陆系统 ####
-        lg = bs.login()
-        # 显示登陆返回信息
-        print('login respond error_code:' + lg.error_code)
-        print('login respond  error_msg:' + lg.error_msg)
-
+    def insert_day_all_tushare(self, start_date='20000901', end_date='20211011'):
         info = pd.read_sql(
             'select * from {}'.format(self.basic.table_name), self.basic.conn)
 
-        start_date = '{}-{}-{}'.format(start_date[:4],
-                                       start_date[4:6], start_date[6:])
-        end_date = '{}-{}-{}'.format(end_date[:4], end_date[4:6], end_date[6:])
-        # 分钟线指标：date,time,code,open,high,low,close,volume,amount,adjustflag
-        # 周月线指标：date,code,open,high,low,close,volume,amount,adjustflag,turn,pctChg
-        fields = "date,time,code,open,high,low,close,volume,amount"
         for ts_code in tqdm(info['ts_code'].values):
-            while True:
-                try:
-                    code = ts_code.lower().split('.')
-                    code = '{}.{}'.format(code[1], code[0])
-                    rs = bs.query_history_k_data_plus(code,
-                                                      fields=fields,
-                                                      start_date=start_date,
-                                                      end_date=end_date,
-                                                      frequency="5",
-                                                      adjustflag="3")
-                    df = pd.DataFrame(rs.get_data(), columns=rs.fields)
+            self._insert_day_tushare(
+                ts_code, start_date=start_date, end_date=end_date)
+        self.quotation_day.vacuum()
 
-                    if rs.error_code != '0':
-                        logger.error('query_history_k_data_plus respond error_code:{},error_msg:{}'.format(
-                            rs.error_code, rs.error_msg))
-                        continue
+    def insert_day_one_tushare(self, ts_code, start_date='20000901', end_date='20211011'):
+        self._insert_day_tushare(
+            ts_code, start_date=start_date, end_date=end_date)
+        self.quotation_day.vacuum()
 
-                    if df is None:
-                        time.sleep(10)
-                        continue
+    def _insert_min_bao_stock(self, ts_code, start_date='20000901', end_date='20211011', frequency="5"):
+        fields = "date,time,code,open,high,low,close,volume,amount"
+        if frequency == '1':
+            quotation = self.quotation_min1
+        elif frequency == '5':
+            quotation = self.quotation_min5
+        elif frequency == '15':
+            quotation = self.quotation_min15
+        elif frequency == '30':
+            quotation = self.quotation_min30
+        elif frequency == '60':
+            quotation = self.quotation_min60
+        else:
+            raise Exception('error frequency')
 
-                    df['ts_code'] = ts_code
-                    self.quotation_min5.insert_list(
-                        list(df.to_dict(orient='index').values()))
-                    break
-                except Exception as e:
+        while True:
+            try:
+                code = ts_code.lower().split('.')
+                code = '{}.{}'.format(code[1], code[0])
+                rs = bs.query_history_k_data_plus(code,
+                                                  fields=fields,
+                                                  start_date=start_date,
+                                                  end_date=end_date,
+                                                  frequency=frequency,
+                                                  adjustflag="3")
+                df = pd.DataFrame(rs.get_data(), columns=rs.fields)
+
+                if rs.error_code != '0':
+                    logger.error('query_history_k_data_plus respond error_code:{},error_msg:{}'.format(
+                        rs.error_code, rs.error_msg))
+                    continue
+
+                if df is None:
                     time.sleep(10)
-        self.quotation_min5.vacuum()
+                    continue
+
+                df['ts_code'] = ts_code
+                quotation.insert_list(
+                    list(df.to_dict(orient='index').values()))
+                break
+            except Exception as e:
+                time.sleep(10)
+        quotation.vacuum()
         # 登出系统 #
         bs.logout()
 
+    def insert_min_all_bao_stock(self, start_date='20000901', end_date='20211011'):
+        info = pd.read_sql(
+            'select * from {}'.format(self.basic.table_name), self.basic.conn)
+        start_date = '{}-{}-{}'.format(start_date[:4],
+                                       start_date[4:6], start_date[6:])
+        end_date = '{}-{}-{}'.format(end_date[:4], end_date[4:6], end_date[6:])
+        for ts_code in tqdm(info['ts_code'].values):
+            for freq in ('5', '10', '15', '30', '60'):
+                self._insert_min_bao_stock(
+                    ts_code, start_date, end_date, frequency=freq)
+        self.quotation_min5.vacuum()
+
+    def insert_min_one_bao_stock(self, ts_code, start_date='20000901', end_date='20211011'):
+        start_date = '{}-{}-{}'.format(start_date[:4],
+                                       start_date[4:6], start_date[6:])
+        end_date = '{}-{}-{}'.format(end_date[:4], end_date[4:6], end_date[6:])
+
+        for freq in ('5', '10', '15', '30', '60'):
+            self._insert_min_bao_stock(
+                ts_code, start_date, end_date, frequency=freq)
+        self.quotation_min5.vacuum()
+
     def save_year(self, year=2020):
         self.insert_basic()
-
         start_date = '{}0101'.format(year)
         end_date = '{}1231'.format(year)
-        self.insert_min5(start_date=start_date, end_date=end_date)
-        self.insert_day(start_date, end_date)
-
+        self.insert_min_all_bao_stock(start_date=start_date, end_date=end_date)
+        self.insert_day_all_tushare(start_date, end_date)
         self.quotation_day.vacuum()
+
+    def save_month(self, month=202001):
+        self.insert_basic()
+        start_date = '{}01'.format(month)
+        end_date = '{}31'.format(month)
+        self.insert_min_all_bao_stock(start_date=start_date, end_date=end_date)
+        self.insert_day_all_tushare(start_date, end_date)
+        self.quotation_day.vacuum()
+
+    def save_one(self, ts_code, start_date='20000901', end_date='20211011'):
+        self.insert_basic()
+        self.insert_day_one_tushare(ts_code, start_date, end_date)
+        self.insert_min_one_bao_stock(
+            ts_code, start_date=start_date, end_date=end_date)
+        self.quotation_day.vacuum()
+
+    def save_ones(self, start_date='20000101', end_date='20301231'):
+        info = pd.read_sql(
+            'select * from {}'.format(self.basic.table_name), self.basic.conn)
+        start_date = '{}-{}-{}'.format(start_date[:4],
+                                       start_date[4:6], start_date[6:])
+        end_date = '{}-{}-{}'.format(end_date[:4], end_date[4:6], end_date[6:])
+        for ts_code in tqdm(info['ts_code'].values):
+            self.save_one(ts_code, start_date=start_date, end_date=end_date)
+
+    def release(self):
+        # 登出系统 #
+        bs.logout()
